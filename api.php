@@ -138,6 +138,75 @@ if ($method === 'POST' && $op === 'sign_upload' && isset($_GET['codigo'])) {
 }
 
 // ====================================
+// POST /api.php?op=csv_upload&csv=ID
+// ====================================
+if ($method === 'POST' && $op === 'csv_upload' && isset($_GET['csv'])) {
+    $csvId = $_GET['csv'];
+
+    if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Archivo no recibido']);
+        exit;
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($_FILES['csv_file']['tmp_name']);
+
+    if ($mime !== 'text/plain' && $mime !== 'text/csv') {
+        http_response_code(415);
+        echo json_encode(['error' => 'Solo se permiten archivos CSV']);
+        exit;
+    }
+
+    $name = preg_replace('/[^a-zA-Z0-9\.\-_]/', '', basename($_FILES['csv_file']['name']));
+    $targetPath = "$csvDir/" . uniqid() . "_$name";
+
+    if (move_uploaded_file($_FILES['csv_file']['tmp_name'], $targetPath)) {
+        // Guardar en base de datos falsa
+        $fakeDb["csv_$csvId"] = $targetPath;
+        file_put_contents($dbFile, json_encode($fakeDb, JSON_PRETTY_PRINT));
+
+        http_response_code(201);
+        echo json_encode([
+            'success' => true,
+            'message' => 'CSV subido exitosamente',
+            'path' => $targetPath,
+            'id' => $csvId,
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['error' => 'Error al guardar el CSV']);
+    }
+
+    exit;
+}
+
+// ====================================
+// GET /api.php?op=csv_download&codigo=ID
+// ====================================
+if ($method === 'GET' && $op === 'csv_download' && isset($_GET['codigo'])) {
+    $codigo = $_GET['codigo'];
+    $key = "csv_$codigo";
+
+    if (isset($fakeDb[$key])) {
+        $archivo = $fakeDb[$key];
+
+        if (file_exists($archivo) && is_readable($archivo)) {
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . basename($archivo) . '"');
+            header('Content-Length: ' . filesize($archivo));
+            readfile($archivo);
+            exit;
+        }
+    }
+
+    http_response_code(404);
+    echo json_encode(['error' => 'CSV no encontrado']);
+    exit;
+}
+
+
+// ====================================
 // Método o ruta no válida
 // ====================================
 http_response_code(405);

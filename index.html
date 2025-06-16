@@ -4,209 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Generador de Firma</title>
-        <style>
-            * {
-                box-sizing: border-box;
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                background: #f2f5f9;
-            }
-
-            .container {
-                max-width: 900px;
-                background: #ffffff;
-                margin: 40px auto;
-                padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            }
-
-            h2 {
-                text-align: center;
-                color: #333;
-                margin-bottom: 25px;
-            }
-
-            label {
-                display: block;
-                margin-top: 18px;
-                font-weight: 600;
-                color: #444;
-            }
-
-            input,
-            textarea,
-            button,
-            select {
-                width: 100%;
-                margin-top: 8px;
-                padding: 12px;
-                font-size: 14px;
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                transition: border-color 0.3s;
-            }
-
-            input:focus,
-            textarea:focus {
-                border-color: #0077ff;
-                outline: none;
-            }
-
-            textarea {
-                resize: vertical;
-                min-height: 100px;
-            }
-
-            .flex-group {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            .flex-group input {
-                flex: 1 1 120px;
-            }
-
-            .optional {
-                font-size: 13px;
-                color: #777;
-            }
-
-            button {
-                background-color: #007bff;
-                color: #fff;
-                font-weight: bold;
-                border: none;
-                cursor: pointer;
-                margin-top: 25px;
-            }
-
-            button:hover {
-                background-color: #0056b3;
-            }
-
-            hr {
-                margin-top: 30px;
-                margin-bottom: 20px;
-                border: none;
-                border-top: 1px solid #eee;
-            }
-
-            #output {
-                margin-top: 20px;
-                background: #f1f1f1;
-                padding: 15px;
-                border-radius: 8px;
-                font-size: 14px;
-                word-break: break-word;
-            }
-
-            @media (max-width: 600px) {
-                .flex-group {
-                    flex-direction: column;
-                }
-            }
-
-            /* Estilos para las pestañas */
-            .tab-container {
-                margin-bottom: 20px;
-            }
-
-            .tab-buttons {
-                display: flex;
-                border-bottom: 1px solid #ddd;
-            }
-
-            .tab-button {
-                padding: 10px 20px;
-                background: #f1f1f1;
-                border: none;
-                cursor: pointer;
-                font-weight: 600;
-                border-radius: 8px 8px 0 0;
-                margin-right: 5px;
-            }
-
-            .tab-button.active {
-                background: #007bff;
-                color: white;
-            }
-
-            .tab-content {
-                display: none;
-                padding: 20px 0;
-            }
-
-            .tab-content.active {
-                display: block;
-            }
-
-            /* Estilos para la tabla de firmas */
-            #signaturesTable {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-
-            #signaturesTable th,
-            #signaturesTable td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-
-            #signaturesTable th {
-                background-color: #f2f2f2;
-            }
-
-            #signaturesTable tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-
-            #signaturesTable tr:hover {
-                background-color: #f1f1f1;
-            }
-
-            .action-buttons {
-                display: flex;
-                gap: 5px;
-            }
-
-            .action-buttons button {
-                padding: 5px 10px;
-                margin: 0;
-                font-size: 12px;
-            }
-
-            .remove-btn {
-                background-color: #dc3545;
-            }
-
-            .remove-btn:hover {
-                background-color: #c82333;
-            }
-
-            .edit-btn {
-                background-color: #ffc107;
-                color: #212529;
-            }
-
-            .edit-btn:hover {
-                background-color: #e0a800;
-            }
-
-            .small-btn {
-                padding: 5px 10px;
-                margin: 0;
-                font-size: 12px;
-                width: auto;
-            }
-        </style>
+        <link rel="stylesheet" href="./public/stile.css">
     </head>
     <body>
         <div class="container">
@@ -234,7 +32,7 @@
                         id="urlDescarga"
                         placeholder="https://tusitio.com/api/descargar-documento.pdf"
                         required,
-                        value="http://localhost/girasol/api.php?op=sign_download&codigo=a1f45880-81f4-4e2c-9fed-3c0a098d8cf2"
+                        value="http://localhost:8080/girasol/api.php?op=sign_download&codigo=a1f45880-81f4-4e2c-9fed-3c0a098d8cf2"
                     />
 
                     <label for="urlSubida"
@@ -245,7 +43,7 @@
                         id="urlSubida"
                         placeholder="https://tusitio.com/api/subir-documento"
                         required,
-                        value="http://localhost/girasol/api.php?op=sign_upload&codigo=a1f45880-81f4-4e2c-9fed-3c0a098d8cf2"
+                        value="http://localhost:8080/girasol/api.php?op=sign_upload&codigo=a1f45880-81f4-4e2c-9fed-3c0a098d8cf2"
                     />
 
                     <label>🖋️ Coordenadas y Tamaño de Firma</label>
@@ -327,401 +125,99 @@ Firmado por: Firmeasy.legal</textarea
                     <div id="output"></div>
                 </div>
 
-                <div id="batchTab" class="tab-content">
-                    <h3>Generador de Firma por Lotes (CSV)</h3>
+<div id="batchTab" class="tab-content">
+    <h3>Generador de Firma por Lotes (CSV)</h3>
 
-                    <div class="flex-group">
-                        <div style="flex: 1">
-                            <label for="batchUrlDescarga"
-                                >📥 URL de descarga del documento *</label
-                            >
-                            <input
-                                type="url"
-                                id="batchUrlDescarga"
-                                placeholder="https://tusitio.com/api/descargar-documento.pdf"
-                                required
-                            />
-                        </div>
-                        <div style="flex: 1">
-                            <label for="batchUrlSubida"
-                                >📤 URL para enviar el documento firmado
-                                *</label
-                            >
-                            <input
-                                type="url"
-                                id="batchUrlSubida"
-                                placeholder="https://tusitio.com/api/subir-documento"
-                                required
-                            />
-                        </div>
-                    </div>
+    <div class="flex-group">
+        <div style="flex: 1">
+            <label for="batchUrlDescarga">📥 URL de descarga del documento *</label>
+            <input
+                type="url"
+                id="batchUrlDescarga"
+                placeholder="https://tusitio.com/api/descargar-documento.pdf"
+                required
+            />
+        </div>
+        <div style="flex: 1">
+            <label for="batchUrlSubida">📤 URL para enviar el documento firmado *</label>
+            <input
+                type="url"
+                id="batchUrlSubida"
+                placeholder="https://tusitio.com/api/subir-documento"
+                required
+            />
+        </div>
+    </div>
 
-                    <label for="batchFileName">📄 Nombre del archivo *</label>
-                    <input
-                        type="text"
-                        id="batchFileName"
-                        placeholder="documento.pdf"
-                        required
-                    />
+    <label for="batchFileName">📄 Nombre del archivo *</label>
+    <input
+        type="text"
+        id="batchFileName"
+        placeholder="documento.pdf"
+        required
+    />
 
-                    <label>🖋️ Coordenadas y Tamaño de Firma</label>
-                    <div class="flex-group">
-                        <input
-                            type="number"
-                            id="batchX"
-                            placeholder="X"
-                            value="340"
-                        />
-                        <input
-                            type="number"
-                            id="batchY"
-                            placeholder="Y"
-                            value="104"
-                        />
-                        <input
-                            type="number"
-                            id="batchWidth"
-                            placeholder="Ancho"
-                            value="150"
-                        />
-                        <input
-                            type="number"
-                            id="batchHeight"
-                            placeholder="Alto"
-                            value="40"
-                        />
-                    </div>
+    <label>🖋️ Coordenadas y Tamaño de Firma</label>
+    <div class="flex-group">
+        <input type="number" id="batchX" placeholder="X" value="340" />
+        <input type="number" id="batchY" placeholder="Y" value="104" />
+        <input type="number" id="batchWidth" placeholder="Ancho" value="150" />
+        <input type="number" id="batchHeight" placeholder="Alto" value="40" />
+    </div>
 
-                    <label>📝 Tamaño de texto y página</label>
-                    <div class="flex-group">
-                        <input
-                            type="number"
-                            id="batchTextSize"
-                            placeholder="Tamaño del texto"
-                            value="6"
-                        />
-                        <input
-                            type="number"
-                            id="batchPage"
-                            placeholder="Página"
-                            value="1"
-                        />
-                    </div>
+    <label>📝 Tamaño de texto y página</label>
+    <div class="flex-group">
+        <input type="number" id="batchTextSize" placeholder="Tamaño del texto" value="6" />
+        <input type="number" id="batchPage" placeholder="Página" value="1" />
+    </div>
 
-                    <label>📄 Texto de firma</label>
-                    <textarea id="batchSigText">
+    <label>📄 Texto de firma</label>
+    <textarea id="batchSigText">
 &lt;SIGNER&gt;
 Fecha: &lt;DATE&gt;
 OU: &lt;OU&gt;
-Firmado por: Firmeasy.legal</textarea
-                    >
+Firmado por: Firmeasy.legal</textarea>
 
-                    <label>🖼️ URL de imagen (firma gráfica)</label>
-                    <input
-                        type="text"
-                        id="batchGraphic"
-                        placeholder="https://ejemplo.com/firma.png"
-                    />
-                    <p class="optional">
-                        Ejemplo: https://cdn.midominio.com/firma.png
-                    </p>
+    <label>🖼️ URL de imagen (firma gráfica)</label>
+    <input type="text" id="batchGraphic" placeholder="https://ejemplo.com/firma.png" />
+    <p class="optional">Ejemplo: https://cdn.midominio.com/firma.png</p>
 
-                    <button onclick="agregarFirma()" class="small-btn">
-                        Agregar firma a la lista
-                    </button>
+    <button class="small-btn" id="addSignatureBtn">Agregar firma a la lista</button>
 
-                    <table id="signaturesTable">
-                        <thead>
-                            <tr>
-                                <th>URL Descarga</th>
-                                <th>URL Subida</th>
-                                <th>Archivo</th>
-                                <th>X</th>
-                                <th>Y</th>
-                                <th>Ancho</th>
-                                <th>Alto</th>
-                                <th>Página</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="signaturesList">
-                            <!-- Las firmas se agregarán aquí -->
-                        </tbody>
-                    </table>
+    <table id="signaturesTable">
+        <thead>
+            <tr>
+                <th>URL Descarga</th>
+                <th>URL Subida</th>
+                <th>Archivo</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Ancho</th>
+                <th>Alto</th>
+                <th>Página</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="signaturesList"></tbody>
+    </table>
 
-                    <div style="margin-top: 20px">
-                        <label for="csvUrl">📊 URL del CSV generado *</label>
-                        <input
-                            type="url"
-                            id="csvUrl"
-                            placeholder="http://localhost:8080/girasol/api.php?op=csv&csv=12"
-                            required
-                        />
+    <div style="margin-top: 20px">
+        <label for="batchTsp">🕓 URL del TSP (Timestamp)</label>
+        <input
+            type="text"
+            id="batchTsp"
+            placeholder="http://localhost:8080/girasol/api.php?op=csv&csv=tsp"
+        />
 
-                        <label for="batchTsp">🕓 URL del TSP (Timestamp)</label>
-                        <input
-                            type="text"
-                            id="batchTsp"
-                            placeholder="http://localhost:8080/girasol/api.php?op=csv&csv=tsp"
-                        />
+        <button id="generateBatchBtn">Generar y abrir enlace por lotes</button>
+    </div>
 
-                        <button onclick="generarEnlaceBatch()">
-                            Generar y abrir enlace por lotes
-                        </button>
-                    </div>
-
-                    <div id="batchOutput"></div>
-                </div>
+    <div id="batchOutput"></div>
+</div>
             </div>
         </div>
-
-        <script>
-            // Funciones para manejar las pestañas
-            function openTab(tabName) {
-                const tabContents =
-                    document.getElementsByClassName("tab-content");
-                for (let i = 0; i < tabContents.length; i++) {
-                    tabContents[i].classList.remove("active");
-                }
-
-                const tabButtons =
-                    document.getElementsByClassName("tab-button");
-                for (let i = 0; i < tabButtons.length; i++) {
-                    tabButtons[i].classList.remove("active");
-                }
-
-                document.getElementById(tabName).classList.add("active");
-                event.currentTarget.classList.add("active");
-            }
-
-            // Función para el generador de firma individual
-            function generarEnlace() {
-                const urlDescarga = document
-                    .getElementById("urlDescarga")
-                    .value.trim();
-                const urlSubida = document
-                    .getElementById("urlSubida")
-                    .value.trim();
-
-                if (!urlDescarga || !urlSubida) {
-                    alert("Las URLs de descarga y subida son obligatorias.");
-                    return;
-                }
-
-                const from = encodeURIComponent(urlDescarga);
-                const to = encodeURIComponent(urlSubida);
-                const x = document.getElementById("x").value;
-                const y = document.getElementById("y").value;
-                const width = document.getElementById("width").value;
-                const height = document.getElementById("height").value;
-                const textSize = document.getElementById("textSize").value;
-                const sigText = encodeURIComponent(
-                    document.getElementById("sigText").value
-                );
-                const page = document.getElementById("page").value;
-                const graphic = document.getElementById("graphic").value.trim();
-                const tsp = document.getElementById("tsp").value.trim();
-
-                let url = `girasoldesktop://legacy?from=${from}&to=${to}`;
-                url += `&vis_sig_x=${x}`;
-                url += `&vis_sig_y=${y}`;
-                url += `&vis_sig_width=${width}`;
-                url += `&vis_sig_height=${height}`;
-                url += `&vis_sig_text=${sigText}`;
-                url += `&vis_sig_page=${page}`;
-                url += `&vis_sig_text_size=${textSize}`;
-                url += `&tlv=1`;
-
-                if (graphic !== "") {
-                    url += `&vis_sig_graphic=${encodeURIComponent(graphic)}`;
-                }
-
-                if (tsp !== "") {
-                    url += `&tsp=${encodeURIComponent(tsp)}`;
-                }
-
-                const output = document.getElementById("output");
-                output.innerHTML = `<strong>🔗 Enlace generado:</strong><br><a id="linkOut" href="${url}">${url}</a>`;
-
-                window.location.href = url;
-            }
-
-            // Variables para el generador por lotes
-            let signatures = [];
-
-            // Función para agregar una firma a la lista
-            function agregarFirma() {
-                const urlDescarga = document
-                    .getElementById("batchUrlDescarga")
-                    .value.trim();
-                const urlSubida = document
-                    .getElementById("batchUrlSubida")
-                    .value.trim();
-                const fileName = document
-                    .getElementById("batchFileName")
-                    .value.trim();
-                const x = document.getElementById("batchX").value;
-                const y = document.getElementById("batchY").value;
-                const width = document.getElementById("batchWidth").value;
-                const height = document.getElementById("batchHeight").value;
-                const textSize = document.getElementById("batchTextSize").value;
-                const sigText = document.getElementById("batchSigText").value;
-                const page = document.getElementById("batchPage").value;
-                const graphic = document
-                    .getElementById("batchGraphic")
-                    .value.trim();
-
-                if (!urlDescarga || !urlSubida || !fileName) {
-                    alert("Las URLs y el nombre del archivo son obligatorios.");
-                    return;
-                }
-
-                const signature = {
-                    urlDescarga,
-                    urlSubida,
-                    fileName,
-                    x,
-                    y,
-                    width,
-                    height,
-                    textSize,
-                    sigText,
-                    page,
-                    graphic,
-                };
-
-                signatures.push(signature);
-                actualizarTablaFirmas();
-
-                // Limpiar campos (opcional)
-                document.getElementById("batchUrlDescarga").value = "";
-                document.getElementById("batchUrlSubida").value = "";
-                document.getElementById("batchFileName").value = "";
-            }
-
-            // Función para actualizar la tabla de firmas
-            function actualizarTablaFirmas() {
-                const tbody = document.getElementById("signaturesList");
-                tbody.innerHTML = "";
-
-                signatures.forEach((sig, index) => {
-                    const row = document.createElement("tr");
-
-                    // Acortar URLs para mostrar
-                    const shortDownloadUrl =
-                        sig.urlDescarga.length > 20
-                            ? sig.urlDescarga.substring(0, 20) + "..."
-                            : sig.urlDescarga;
-                    const shortUploadUrl =
-                        sig.urlSubida.length > 20
-                            ? sig.urlSubida.substring(0, 20) + "..."
-                            : sig.urlSubida;
-
-                    row.innerHTML = `
-                        <td title="${sig.urlDescarga}">${shortDownloadUrl}</td>
-                        <td title="${sig.urlSubida}">${shortUploadUrl}</td>
-                        <td>${sig.fileName}</td>
-                        <td>${sig.x}</td>
-                        <td>${sig.y}</td>
-                        <td>${sig.width}</td>
-                        <td>${sig.height}</td>
-                        <td>${sig.page}</td>
-                        <td class="action-buttons">
-                            <button class="small-btn edit-btn" onclick="editarFirma(${index})">Editar</button>
-                            <button class="small-btn remove-btn" onclick="eliminarFirma(${index})">Eliminar</button>
-                        </td>
-                    `;
-
-                    tbody.appendChild(row);
-                });
-            }
-
-            // Función para eliminar una firma
-            function eliminarFirma(index) {
-                signatures.splice(index, 1);
-                actualizarTablaFirmas();
-            }
-
-            // Función para editar una firma
-            function editarFirma(index) {
-                const sig = signatures[index];
-
-                document.getElementById("batchUrlDescarga").value =
-                    sig.urlDescarga;
-                document.getElementById("batchUrlSubida").value = sig.urlSubida;
-                document.getElementById("batchFileName").value = sig.fileName;
-                document.getElementById("batchX").value = sig.x;
-                document.getElementById("batchY").value = sig.y;
-                document.getElementById("batchWidth").value = sig.width;
-                document.getElementById("batchHeight").value = sig.height;
-                document.getElementById("batchTextSize").value = sig.textSize;
-                document.getElementById("batchSigText").value = sig.sigText;
-                document.getElementById("batchPage").value = sig.page;
-                document.getElementById("batchGraphic").value = sig.graphic;
-
-                eliminarFirma(index);
-            }
-
-            // Función para generar el enlace por lotes
-            function generarEnlaceBatch() {
-                if (signatures.length === 0) {
-                    alert("Debe agregar al menos una firma a la lista.");
-                    return;
-                }
-
-                const csvUrl = document.getElementById("csvUrl").value.trim();
-                const tsp = document.getElementById("batchTsp").value.trim();
-
-                if (!csvUrl) {
-                    alert("La URL del CSV generado es obligatoria.");
-                    return;
-                }
-
-                // Generar el contenido CSV
-                let csvContent = "";
-                signatures.forEach((sig) => {
-                    const line = [
-                        sig.urlDescarga,
-                        sig.urlSubida,
-                        sig.fileName,
-                        sig.x,
-                        sig.y,
-                        sig.width,
-                        sig.height,
-                        `"${sig.sigText.replace(/"/g, '""')}"`,
-                        "", // Campo de imagen de firma gráfica vacío (se mantiene pero no se usa)
-                        sig.page,
-                        sig.textSize,
-                    ].join(",");
-
-                    csvContent += line + "\n";
-                });
-
-                // Codificar el CSV para mostrarlo
-                const encodedCsv = encodeURIComponent(csvContent);
-
-                // Generar la URL
-                let url = `miappmaui://?batch_csv=${encodeURIComponent(
-                    csvUrl
-                )}`;
-
-                if (tsp) {
-                    url += `&tsp=${encodeURIComponent(tsp)}`;
-                }
-
-                // Mostrar resultados
-                const output = document.getElementById("batchOutput");
-                output.innerHTML = `
-                    <strong>🔗 Enlace generado:</strong><br>
-                    <a href="${url}">${url}</a>
-                    <br><br>
-                    <strong>📄 Contenido del CSV:</strong><br>
-                    <textarea style="width:100%; height:150px; font-family: monospace;">${csvContent}</textarea>
-                `;
-
-                // Abrir el enlace
-                window.location.href = url;
-            }
-        </script>
+        <script src="./public/tabs.js"></script>
+        <script src="./public/single-signature.js"></script>
+        <script src="./public/batch-signature.js"></script>
     </body>
 </html>

@@ -18,23 +18,32 @@ async function generateTableRows() {
   globalDocuments = await loadDocuments();
 
   globalDocuments.forEach((doc, index) => {
-    const isSigned = doc.status === "signed";
+    const userSignature = SignatureTracker.getUserSignatures()[doc.id];
+    const isSigned = userSignature?.status === "completed";
     const rowClass = index % 2 === 0 ? "bg-white" : "bg-slate-25";
+    const userName = userSignature?.userName || UserManager.getUserName();
 
     tbody.innerHTML += `
       <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors ${rowClass}">
         <td class="p-4">
           <div class="file-cell">
             <i class="file-icon" data-lucide="file-text"></i>
-            <span class="file-name">${doc.fileName}</span>
+            <div>
+              <span class="file-name">${doc.fileName}</span>
+              ${
+                userSignature
+                  ? `<div class="text-xs text-gray-500 mt-1">Firmado por: ${userName}</div>`
+                  : ""
+              }
+            </div>
           </div>
         </td>
         <td class="text-center">
           <button class="btn btn-primary btn-sm btn-shadow" ${
             isSigned ? "disabled" : ""
-          }onclick='BtnFirmarDocumentById(${doc.id})'>
+          } onclick='BtnFirmarDocumentById(${doc.id})'>
             <i class="icon-sm" data-lucide="pen-tool"></i>
-            Firmar
+            ${isSigned ? "Ya firmado" : "Firmar"}
           </button>
         </td>
         <td class="text-center">
@@ -56,7 +65,7 @@ async function generateTableRows() {
         <td class="text-center">
           <button class="btn btn-secondary btn-sm" ${
             !isSigned ? "disabled" : ""
-          }>
+          } onclick='viewUserSignature("${doc.id}")'>
             <i class="icon-sm" data-lucide="${isSigned ? "eye" : "clock"}"></i>
             ${isSigned ? "Ver" : "Pendiente"}
           </button>
@@ -75,9 +84,11 @@ async function generateMobileCards() {
   globalDocuments = await loadDocuments();
 
   globalDocuments.forEach((doc) => {
-    const isSigned = doc.status === "signed";
+    const userSignature = SignatureTracker.getUserSignatures()[doc.id];
+    const isSigned = userSignature?.status === "completed";
     const badgeClass = isSigned ? "badge-signed" : "badge-pending";
     const badgeText = isSigned ? "Firmado" : "Pendiente";
+    const userName = userSignature?.userName || UserManager.getUserName();
 
     mobileContainer.innerHTML += `
       <div class="card-mobile">
@@ -87,6 +98,11 @@ async function generateMobileCards() {
             <div class="mobile-file-info">
               <h3 class="mobile-file-name">${doc.fileName}</h3>
               <span class="status-badge ${badgeClass}">${badgeText}</span>
+              ${
+                isSigned
+                  ? `<div class="text-xs text-gray-500">Firmado por: ${userName}</div>`
+                  : ""
+              }
             </div>
           </div>
           <div class="button-grid">
@@ -106,7 +122,7 @@ async function generateMobileCards() {
             </button>
             <button class="btn btn-secondary btn-sm" ${
               !isSigned ? "disabled" : ""
-            }>
+            } onclick='viewUserSignature("${doc.id}")'>
               <i class="icon-sm" data-lucide="${
                 isSigned ? "eye" : "clock"
               }"></i>
@@ -127,7 +143,6 @@ async function generateMobileCards() {
 
   lucide.createIcons();
 }
-
 // Modal de configuración
 function openSignatureModal(docId) {
   const doc = globalDocuments.find((d) => d.id == docId);
@@ -247,43 +262,124 @@ function openTsaModal(docId) {
   };
 }
 
-
 function BtnFirmarDocument(doc) {
-  const cfg = doc.signatureConfig || {};
-  const params = new URLSearchParams();
-  const codigo = encodeURIComponent(doc.codePdf);
+  try {
+    // 1. Obtener información del usuario
+    const userId = UserManager.getUserId();
+    const userName = UserManager.getUserName();
 
-  params.set("from", `${BASE_URL}?op=sign_download&codigo=${codigo}`);
-  params.set("to", `${BASE_URL}?op=sign_upload&codigo=${codigo}`);
+    // 2. Validar documento y configuración
+    if (!doc?.codePdf) {
+      throw new Error("Documento no tiene código PDF válido");
+    }
 
-  params.set("vis_sig_x", cfg.positionx);
-  params.set("vis_sig_y", cfg.positiony);
-  params.set("vis_sig_width", cfg.width);
-  params.set("vis_sig_height", cfg.height);
-  params.set("vis_sig_page", cfg.pageNumber || -1);
-  params.set("vis_sig_text_size", cfg.textSize || 6);
-  params.set("vis_sig_text", encodeURIComponent(DEFAULT_SIGNATURE_TEXT));
+    const cfg = doc.signatureConfig || {};
+    const params = new URLSearchParams();
+    const codigo = encodeURIComponent(doc.codePdf);
 
-  if (cfg.useGraphic && cfg.graphic) {
-    params.set("vis_sig_graphic", cfg.graphic);
+    // 3. Registrar inicio de proceso de firma
+    SignatureTracker.recordSignature(doc.id, {
+      status: "in_progress",
+      documentName: doc.fileName,
+      userId: userId,
+      userName: userName,
+      timestamp: new Date().toISOString(),
+      config: {
+        position: { x: cfg.positionx, y: cfg.positiony },
+        size: { width: cfg.width, height: cfg.height },
+      },
+    });
+
+    params.set(
+      "from",
+      `${BASE_URL}?op=sign_download&codigo=${codigo}&user_id=${userId}`
+    );
+    params.set(
+      "to",
+      `${BASE_URL}?op=sign_upload&codigo=${codigo}&user_id=${userId}`
+    );
+
+    // Configuración visual de la firma
+    params.set("vis_sig_x", cfg.positionx || 100);
+    params.set("vis_sig_y", cfg.positiony || 150);
+    params.set("vis_sig_width", cfg.width || 150);
+    params.set("vis_sig_height", cfg.height || 55);
+    params.set("vis_sig_page", cfg.pageNumber || -1);
+    params.set("vis_sig_text_size", cfg.textSize || 6);
+    params.set(
+      "vis_sig_text",
+      encodeURIComponent(cfg.signatureText || DEFAULT_SIGNATURE_TEXT)
+    );
+
+    // Imagen de firma gráfica (si está configurada)
+    if (cfg.useGraphic && cfg.graphic) {
+      if (!isValidUrl(cfg.graphic)) {
+        throw new Error("URL de imagen de firma no válida");
+      }
+      params.set("vis_sig_graphic", cfg.graphic);
+    }
+
+    // Configuración TSP (si está habilitado)
+    if (cfg.useTsp) {
+      if (!cfg.tsp?.url) {
+        throw new Error("URL TSP no configurada");
+      }
+      params.set("tsp", `${BASE_URL}?op=csv&csv=tsp&user_id=${userId}`);
+      if (cfg.tsp.name) params.set("tsp_user", cfg.tsp.name);
+      if (cfg.tsp.password) params.set("tsp_pass", cfg.tsp.password);
+      params.set("tlv", 1);
+    } else {
+      params.set("tlv", 0);
+    }
+
+    // 5. Redirigir a la aplicación de escritorio
+    const uri = "girasoldesktop://?" + params.toString();
+    console.log("Iniciando proceso de firma:", {
+      document: doc.id,
+      user: userId,
+      params: Object.fromEntries(params),
+    });
+
+    console.log("Redirigiendo a:", uri);
+    window.location.href = uri;
+  } catch (error) {
+    console.error("Error en BtnFirmarDocument:", error);
+    alert(`Error al preparar firma: ${error.message}`);
   }
+}
 
-  if (cfg.useTsp && cfg.tsp && cfg.tsp.url) {
-    params.set("tsp", `${base}?op=csv&csv=tsp`);
-    if (cfg.tsp.name) params.set("tsp_user", cfg.tsp.name);
-    if (cfg.tsp.password) params.set("tsp_pass", cfg.tsp.password);
-    params.set("tlv", 1);
-  } else {
-    params.set("tlv", 0);
+// Función auxiliar para validar URLs
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
   }
-
-  const uri = "girasoldesktop://?" + params.toString();
-
-  window.location.href = uri;
 }
 
 // Inicializar app al cargar DOM
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Cargar documentos primero
+  globalDocuments = await loadDocuments();
+
+  // Luego verificar firmas y renderizar
+  const urlParams = new URLSearchParams(window.location.search);
+  const signedDocId = urlParams.get("signed_doc_id");
+  const signingUser = urlParams.get("signing_user");
+
+  if (signedDocId && signingUser) {
+    const signatures = SignatureTracker.getUserSignatures();
+    if (signatures[signedDocId]?.userId === signingUser) {
+      SignatureTracker.recordSignature(signedDocId, {
+        ...signatures[signedDocId],
+        status: "completed",
+        signedAt: new Date().toISOString(),
+      });
+    }
+  }
+
+  // Renderizar
   generateTableRows();
   generateMobileCards();
 });
@@ -299,4 +395,15 @@ function openConfigTsaModal(docId) {
 function BtnFirmarDocumentById(docId) {
   const doc = globalDocuments.find((d) => d.id == docId);
   BtnFirmarDocument(doc);
+}
+
+function viewUserSignature(documentId) {
+  const signature = SignatureTracker.getUserSignatures()[documentId];
+  if (signature?.status === "completed") {
+    // Aquí implementa la lógica para ver el documento firmado
+    alert(`Mostrando documento firmado por ${signature.userName}`);
+    // window.open(signature.documentUrl, '_blank'); // Si tienes una URL
+  } else {
+    alert("No has firmado este documento aún");
+  }
 }

@@ -2,6 +2,17 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+
+header("Access-Control-Allow-Origin: *"); // Permite todos los dominios
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Métodos permitidos
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Headers permitidos
+
+// Si es una solicitud OPTIONS (preflight), termina la ejecución
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 // Rutas y base de datos
 $baseDir = __DIR__;
 $uploadDir = $baseDir . '/uploads';

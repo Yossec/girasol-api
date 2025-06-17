@@ -1,223 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Generador de Firma</title>
-        <link rel="stylesheet" href="./public/stile.css">
-    </head>
-    <body>
-        <div class="container">
-            <h2>Generador de Enlace de Firma</h2>
-
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button
-                        class="tab-button active"
-                        onclick="openTab('singleTab')"
-                    >
-                        Firma Individual
-                    </button>
-                    <button class="tab-button" onclick="openTab('batchTab')">
-                        Firma por Lotes (CSV)
-                    </button>
-                </div>
-
-                <div id="singleTab" class="tab-content active">
-                    <label for="urlDescarga"
-                        >📥 URL de descarga del documento *</label
-                    >
-                    <input
-                        type="url"
-                        id="urlDescarga"
-                        placeholder="https://tusitio.com/api/descargar-documento.pdf"
-                        required,
-                        value="http://localhost:8080/girasol/api.php?op=sign_download&codigo=a1f45880-81f4-4e2c-9fed-3c0a098d8cf2"
-                    />
-
-                    <label for="urlSubida"
-                        >📤 URL para enviar el documento firmado *</label
-                    >
-                    <input
-                        type="url"
-                        id="urlSubida"
-                        placeholder="https://tusitio.com/api/subir-documento"
-                        required,
-                        value="http://localhost:8080/girasol/api.php?op=sign_upload&codigo=a1f45880-81f4-4e2c-9fed-3c0a098d8cf2"
-                    />
-
-                    <label>🖋️ Coordenadas y Tamaño de Firma</label>
-                    <div class="flex-group">
-                        <input
-                            type="number"
-                            id="x"
-                            placeholder="X"
-                            value="340"
-                        />
-                        <input
-                            type="number"
-                            id="y"
-                            placeholder="Y"
-                            value="104"
-                        />
-                        <input
-                            type="number"
-                            id="width"
-                            placeholder="Ancho"
-                            value="150"
-                        />
-                        <input
-                            type="number"
-                            id="height"
-                            placeholder="Alto"
-                            value="40"
-                        />
-                    </div>
-
-                    <label>📝 Tamaño de texto y página</label>
-                    <div class="flex-group">
-                        <input
-                            type="number"
-                            id="textSize"
-                            placeholder="Tamaño del texto"
-                            value="6"
-                        />
-                        <input
-                            type="number"
-                            id="page"
-                            placeholder="Página"
-                            value="-1"
-                        />
-                    </div>
-
-                    <label>📄 Texto de firma</label>
-                    <textarea id="sigText">
-&lt;SIGNER&gt;
-Fecha: &lt;DATE&gt;
-OU: &lt;OU&gt;
-Firmado por: Firmeasy.legal</textarea
-                    >
-
-                    <hr />
-                    <h4 style="margin-top: 0">⚙️ Opcionales</h4>
-
-                    <label>🖼️ URL de imagen (firma gráfica)</label>
-                    <input
-                        type="text"
-                        id="graphic"
-                        placeholder="https://ejemplo.com/firma.png",
-                    />
-                    <p class="optional">
-                        Ejemplo: https://cdn.midominio.com/firma.png
-                    </p>
-
-                    <label>🕓 URL del TSP (Timestamp)</label>
-                    <input
-                        type="text"
-                        id="tsp"
-                        placeholder="http://localhost:8080/api/tsp",
-                    />
-
-                    <button onclick="generarEnlace()">
-                        Generar y abrir enlace
-                    </button>
-
-                    <div id="output"></div>
-                </div>
-
-<div id="batchTab" class="tab-content">
-    <h3>Generador de Firma por Lotes (CSV)</h3>
-
-    <div class="flex-group">
-        <div style="flex: 1">
-            <label for="batchUrlDescarga">📥 URL de descarga del documento *</label>
-            <input
-                type="url"
-                id="batchUrlDescarga"
-                placeholder="https://tusitio.com/api/descargar-documento.pdf"
-                required
-            />
-        </div>
-        <div style="flex: 1">
-            <label for="batchUrlSubida">📤 URL para enviar el documento firmado *</label>
-            <input
-                type="url"
-                id="batchUrlSubida"
-                placeholder="https://tusitio.com/api/subir-documento"
-                required
-            />
-        </div>
-    </div>
-
-    <label for="batchFileName">📄 Nombre del archivo *</label>
-    <input
-        type="text"
-        id="batchFileName"
-        placeholder="documento.pdf"
-        required
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firmeasy App</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
     />
+    <link href="https://unpkg.com/lucide@latest/icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./public/stilefirmeasy.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Firmeasy App</h1>
+        <p>Gestiona tus documentos digitales de forma simple y segura</p>
+      </div>
 
-    <label>🖋️ Coordenadas y Tamaño de Firma</label>
-    <div class="flex-group">
-        <input type="number" id="batchX" placeholder="X" value="340" />
-        <input type="number" id="batchY" placeholder="Y" value="104" />
-        <input type="number" id="batchWidth" placeholder="Ancho" value="150" />
-        <input type="number" id="batchHeight" placeholder="Alto" value="40" />
-    </div>
+      <!-- Action Button -->
+      <div class="action-button">
+        <button class="btn btn-primary btn-lg btn-shadow">
+          <i class="icon" data-lucide="users"></i>
+          Firma Masiva
+        </button>
+      </div>
 
-    <label>📝 Tamaño de texto y página</label>
-    <div class="flex-group">
-        <input type="number" id="batchTextSize" placeholder="Tamaño del texto" value="6" />
-        <input type="number" id="batchPage" placeholder="Página" value="1" />
-    </div>
+      <!-- Table Container -->
+      <div class="card">
+        <div class="card-content">
+          <!-- Desktop Table -->
+          <div class="hidden-md">
+            <table class="table" id="documents-table">
+              <thead>
+                <tr>
+                  <th style="width: 40%">
+                    <div class="file-cell">
+                      <i class="file-icon" data-lucide="file-text"></i>
+                      Archivo
+                    </div>
+                  </th>
+                  <th class="text-center">Firma PDF</th>
+                  <th class="text-center">Firma con Sello</th>
+                  <th class="text-center">Configuración</th>
+                  <th class="text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="documents-body">
+                <!-- Se llenará con JavaScript -->
+              </tbody>
+            </table>
+          </div>
 
-    <label>📄 Texto de firma</label>
-    <textarea id="batchSigText">
-&lt;SIGNER&gt;
-Fecha: &lt;DATE&gt;
-OU: &lt;OU&gt;
-Firmado por: Firmeasy.legal</textarea>
-
-    <label>🖼️ URL de imagen (firma gráfica)</label>
-    <input type="text" id="batchGraphic" placeholder="https://ejemplo.com/firma.png" />
-    <p class="optional">Ejemplo: https://cdn.midominio.com/firma.png</p>
-
-    <button class="small-btn" id="addSignatureBtn">Agregar firma a la lista</button>
-
-    <table id="signaturesTable">
-        <thead>
-            <tr>
-                <th>URL Descarga</th>
-                <th>URL Subida</th>
-                <th>Archivo</th>
-                <th>X</th>
-                <th>Y</th>
-                <th>Ancho</th>
-                <th>Alto</th>
-                <th>Página</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="signaturesList"></tbody>
-    </table>
-
-    <div style="margin-top: 20px">
-        <label for="batchTsp">🕓 URL del TSP (Timestamp)</label>
-        <input
-            type="text"
-            id="batchTsp"
-            placeholder="http://localhost:8080/girasol/api.php?op=csv&csv=tsp"
-        />
-
-        <button id="generateBatchBtn">Generar y abrir enlace por lotes</button>
-    </div>
-
-    <div id="batchOutput"></div>
-</div>
-            </div>
+          <!-- Mobile Cards -->
+          <div class="visible-md" id="mobile-documents" style="padding: 16px">
+            <!-- Se llenará con JavaScript -->
+          </div>
         </div>
-        <script src="./public/tabs.js"></script>
-        <script src="./public/single-signature.js"></script>
-        <script src="./public/batch-signature.js"></script>
-    </body>
+      </div>
+      <!-- Footer -->
+      <div class="footer">
+        <p>© 2024 Firmeasy App - Firma digital segura y confiable</p>
+      </div>
+    </div>
+    <!-- Modal para configuración de firma -->
+    <div id="modal-signature" class="config-modal hidden">
+      <div class="modal-content">
+        <h3>Configuración de Firma</h3>
+        <div id="signature-fields"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="save-signature">Guardar</button>
+          <button class="btn btn-secondary" id="close-signature">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para configuración TSA -->
+    <div id="modal-tsa" class="config-modal hidden">
+      <div class="modal-content">
+        <h3>Configuración del Sello de Tiempo (TSA)</h3>
+        <div id="tsa-fields"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="save-tsa">Guardar</button>
+          <button class="btn btn-secondary" id="close-tsa">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="./public/config.js"></script>
+    <script src="./public/firmamasiva.js"></script>
+    <script src="./public/firmeasyapp.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>

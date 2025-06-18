@@ -2,18 +2,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-header("Access-Control-Allow-Origin: *"); // Permite todos los dominios
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Métodos permitidos
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Headers permitidos
-
-// Si es una solicitud OPTIONS (preflight), termina la ejecución
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// Rutas y base de datos
 $baseDir = __DIR__;
 $uploadDir = $baseDir . '/uploads';
 $samplesDir = $baseDir . '/samples';
@@ -37,8 +34,7 @@ if ($method === 'GET' && $op === 'sign_download' && isset($_GET['codigo'])) {
 
     if (isset($fakeDb[$codigo])) {
         $archivo = $fakeDb[$codigo];
-
-        if (file_exists($archivo) && is_readable($archivo)) {
+        if (file_exists($archivo)) {
             header('Content-Type: application/pdf');
             header('Content-Disposition: attachment; filename="' . basename($archivo) . '"');
             header('Content-Length: ' . filesize($archivo));
@@ -48,9 +44,46 @@ if ($method === 'GET' && $op === 'sign_download' && isset($_GET['codigo'])) {
     }
 
     http_response_code(404);
-    echo json_encode(['error' => 'Archivo no encontrado']);
+    echo json_encode(['error' => 'Archivo firmado no encontrado']);
     exit;
 }
+
+// GET /api.php?op=download_signed&codigo=ID&user_id=USER
+if ($method === 'GET' && $op === 'download_signed' && isset($_GET['codigo']) && isset($_GET['user_id'])) {
+    $codigo = $_GET['codigo'];
+    $userId = $_GET['user_id'];
+
+    $signedDbFile = $baseDir . '/signed_docs.json';
+    if (!file_exists($signedDbFile)) {
+        http_response_code(404);
+        exit('Archivo firmado no encontrado');
+    }
+
+    $signedDb = json_decode(file_get_contents($signedDbFile), true);
+
+    $docs = $signedDb[$userId] ?? [];
+    $found = null;
+
+    foreach ($docs as $doc) {
+        if ($doc['code'] === $codigo) {
+            $found = $doc;
+            break;
+        }
+    }
+
+    if (!$found || !file_exists($found['filePath'])) {
+        http_response_code(404);
+        exit('Archivo firmado no disponible');
+    }
+
+    // Descargar el archivo
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="' . basename($found['filePath']) . '"');
+    readfile($found['filePath']);
+    exit;
+}
+
+
 
 // ====================================
 // GET /api.php?op=sample&codigo=ID
@@ -109,8 +142,9 @@ if ($method === 'GET' && $op === 'csv' && isset($_GET['csv'])) {
 // ====================================
 // POST /api.php?op=sign_upload&codigo=ID
 // ====================================
-if ($method === 'POST' && $op === 'sign_upload' && isset($_GET['codigo'])) {
+if ($method === 'POST' && $op === 'sign_upload' && isset($_GET['codigo']) && isset($_GET['user_id'])) {
     $codigo = $_GET['codigo'];
+    $userId = $_GET['user_id'];
 
     if (!isset($_FILES['pdf_file']) || $_FILES['pdf_file']['error'] !== UPLOAD_ERR_OK) {
         http_response_code(400);
@@ -131,20 +165,31 @@ if ($method === 'POST' && $op === 'sign_upload' && isset($_GET['codigo'])) {
     $targetPath = "$uploadDir/" . uniqid() . "_$name";
 
     if (move_uploaded_file($_FILES['pdf_file']['tmp_name'], $targetPath)) {
-        $fakeDb[$codigo] = $targetPath;
-        file_put_contents($dbFile, json_encode($fakeDb, JSON_PRETTY_PRINT));
 
+        // 2. Guardar en signed_docs.json
+        $signedDbFile = $baseDir . '/signed_docs.json';
+        $signedDb = file_exists($signedDbFile) ? json_decode(file_get_contents($signedDbFile), true) : [];
+
+        if (!isset($signedDb[$userId])) {
+            $signedDb[$userId] = [];
+        }
+
+        // Agregar entrada
+        $signedDb[$userId][] = [
+            'code' => $codigo,
+            'filePath' => $targetPath,
+            'signedAt' => date('c') // ISO 8601
+        ];
+
+        file_put_contents($signedDbFile, json_encode($signedDb, JSON_PRETTY_PRINT));
+
+        // 3. Respuesta
         http_response_code(201);
-        echo json_encode([
-            'success' => true,
-            'message' => 'Archivo subido exitosamente',
-            'path' => $targetPath,
-        ]);
+        echo json_encode(['success' => true, 'path' => $targetPath]);
     } else {
         http_response_code(500);
         echo json_encode(['error' => 'Error al guardar archivo']);
     }
-
     exit;
 }
 
@@ -222,3 +267,19 @@ if ($method === 'GET' && $op === 'csv_download' && isset($_GET['codigo'])) {
 // ====================================
 http_response_code(405);
 echo json_encode(['error' => 'Método o parámetro inválido']);
+
+function wasDocumentSigned($userId, $documentCode) {
+    $jsonPath = "firmas.json"; // o donde guardes las firmas
+    if (!file_exists($jsonPath)) return false;
+
+    $data = json_decode(file_get_contents($jsonPath), true);
+    if (!isset($data[$userId])) return false;
+
+    foreach ($data[$userId] as $entry) {
+        if ($entry['code'] === $documentCode) {
+            return true;
+        }
+    }
+
+    return false;
+}

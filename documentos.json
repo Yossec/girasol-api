@@ -1,45 +1,45 @@
 [
-  {
-    "id": 1,
-    "fileName": "Contrato_de_Servicios_Profesionales_2024.pdf",
-    "status": "pending",
-    "codePdf":"a1f45880-81f4-4e2c-9fed-3c0a098d8cf2",
-    "signatureConfig": {
-      "width": 150,
-      "height": 55,
-      "positionx": 340,
-      "positiony": 695,
-      "pageNumber": 1,
-      "useGraphic": false,
-      "graphic": "assets/img/graphic.png",
-      "useTsp": false,
-      "tsp": {
-        "url": "https://example.com/tsp",
-        "name": null,
-        "password": null
-      }
+    {
+        "id": 1,
+        "fileName": "Contrato_de_Servicios_Profesionales_2024.pdf",
+        "status": "pending",
+        "codePdf": "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2",
+        "signatureConfig": {
+            "width": 150,
+            "height": 55,
+            "positionx": 340,
+            "positiony": 695,
+            "pageNumber": 1,
+            "useGraphic": false,
+            "graphic": "assets/img/graphic.png",
+            "useTsp": false,
+            "tsp": {
+                "url": "https://example.com/tsp",
+                "name": null,
+                "password": null
+            }
+        }
+    },
+    {
+        "id": 2,
+        "fileName": "Contrato.pdf",
+        "status": "pending",
+        "codePdf": "bb59a806-f5f1-44b5-a629-87d5e2f0af76",
+        "namePdf": "contrato_servicios",
+        "signatureConfig": {
+            "width": 155,
+            "height": 55,
+            "positionx": 340,
+            "positiony": 693,
+            "pageNumber": 1,
+            "useGraphic": false,
+            "graphic": "assets/img/graphic.png",
+            "useTsp": false,
+            "tsp": {
+                "url": "https://example.com/tsp",
+                "name": null,
+                "password": null
+            }
+        }
     }
-  },
- {
-    "id": 2,
-    "fileName": "Contrato.pdf",
-    "status": "pending",
-     "codePdf":"bb59a806-f5f1-44b5-a629-87d5e2f0af76",
-    "namePdf": "contrato_servicios",
-    "signatureConfig": {
-      "width": 800,
-      "height": 600,
-      "positionx": 100,
-      "positiony": 150,
-      "pageNumber": 1,
-      "useGraphic": false,
-      "graphic": "assets/img/graphic.png",
-      "useTsp": false,
-      "tsp": {
-        "url": "https://example.com/tsp",
-        "name": null,
-        "password": null
-      }
-    }
-  }
 ]

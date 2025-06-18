@@ -57,6 +57,12 @@ body {
   justify-content: flex-end;
   margin-bottom: 24px;
 }
+.action-button-download {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+
 
 .btn {
   display: inline-flex;
@@ -467,4 +473,62 @@ label {
   font-weight: normal;
   font-style: italic;
   opacity: 0.8;
+}
+
+/* Contenedor alineado */
+.sig-graphic-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Estilo checkbox base aislado */
+.sig-graphic-toggle input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #888;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Check visual (tick) */
+.sig-graphic-toggle input[type="checkbox"]:checked {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.sig-graphic-toggle input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Etiqueta alineada y clara */
+.sig-graphic-toggle label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+.flex {
+    display: flex;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.flex-1 {
+    flex: 1;
 }

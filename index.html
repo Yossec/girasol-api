@@ -25,13 +25,21 @@
             </div>
 
             <!-- Action Button -->
-            <div class="action-button">
-                <button class="btn btn-primary btn-lg btn-shadow">
-                    <i class="icon" data-lucide="users"></i>
-                    Firma Masiva
-                </button>
+            <div class="flex justify-between gap-4 mt-4">
+                <div class="action-button-download flex-1">
+                    <button class="btn btn-primary btn-lg btn-shadow w-full"
+                            onclick="window.open('https://apps.microsoft.com/detail/9P887TN66132?hl=es-es&gl=PE&ocid=pdpshare', '_blank')">
+                        <i class="icon" data-lucide="download"></i>
+                        Descargar el Programa
+                    </button>
+                </div>
+                <div class="action-button flex-1">
+                    <button class="btn btn-primary btn-lg btn-shadow w-full" onclick="iniciarFirmaMasiva()">
+                        <i class="icon" data-lucide="edit"></i>
+                        Firma Masiva
+                    </button>
+                </div>
             </div>
-
             <!-- Table Container -->
             <div class="card">
                 <div class="card-content">

@@ -48,8 +48,13 @@ async function generateTableRows() {
     tbody.innerHTML = "";
 
     // Cargar documentos y firmas
-    globalDocuments = await loadDocuments();
-    globalSignedDocs = await loadSignedDocuments();
+    if (!globalDocuments || globalDocuments.length === 0) {
+        globalDocuments = await loadDocuments();
+    }
+
+    if (!globalSignedDocs) {
+        globalSignedDocs = await loadSignedDocuments();
+    }
 
     // Obtener firmas del usuario actual
     const userId = UserManager.getUserId();
@@ -160,57 +165,59 @@ function openSignatureModal(docId) {
     const cfg = doc.signatureConfig || {};
 
     const html = `
+    <div class="sig-graphic-toggle">
+    <input type="checkbox" id="sig-use-graphic" ${cfg.useGraphic ? "checked" : ""}>
+    <label for="sig-use-graphic">Usar imagen gráfica en la firma</label>
+    </div>
+
     <label class="optional">URL del gráfico:</label>
-    <input type="text" id="sig-graphic" class="input" placeholder="https://... (opcional)" value="${
-        cfg.graphic || ""
-    }">
+    <input type="text" id="sig-graphic" class="input mb-2" placeholder="https://... (opcional)" value="${cfg.graphic || ""}" ${cfg.useGraphic ? "" : "disabled"}>
 
     <div class="flex gap-2">
       <div class="flex-1">
         <label>Anchura (px):</label>
-        <input type="number" id="sig-width" class="input" value="${
-            cfg.width || 150
-        }">
+        <input type="number" id="sig-width" class="input" value="${cfg.width || 150}">
       </div>
       <div class="flex-1">
         <label>Altura (px):</label>
-        <input type="number" id="sig-height" class="input" value="${
-            cfg.height || 55
-        }">
+        <input type="number" id="sig-height" class="input" value="${cfg.height || 55}">
       </div>
     </div>
 
-    <div class="flex gap-2">
+    <div class="flex gap-2 mt-2">
       <div class="flex-1">
         <label>Posición X (px):</label>
-        <input type="number" id="sig-x" class="input" value="${
-            cfg.positionx || 100
-        }">
+        <input type="number" id="sig-x" class="input" value="${cfg.positionx || 100}">
       </div>
       <div class="flex-1">
         <label>Posición Y (px):</label>
-        <input type="number" id="sig-y" class="input" value="${
-            cfg.positiony || 150
-        }">
+        <input type="number" id="sig-y" class="input" value="${cfg.positiony || 150}">
       </div>
       <div class="flex-1">
         <label>Número de página:</label>
-        <input type="number" id="sig-page" class="input" value="${
-            cfg.pageNumber || 1
-        }" disabled>
+        <input type="number" id="sig-page" class="input" value="${cfg.pageNumber || 1}" disabled>
       </div>
     </div>
-  `;
+    `;
 
     document.getElementById("signature-fields").innerHTML = html;
     document.getElementById("modal-signature").classList.remove("hidden");
 
+    const useGraphicCheckbox = document.getElementById("sig-use-graphic");
+    const graphicInput = document.getElementById("sig-graphic");
+
+    useGraphicCheckbox.onchange = () => {
+        graphicInput.disabled = !useGraphicCheckbox.checked;
+    };
+
     document.getElementById("save-signature").onclick = () => {
-        cfg.graphic = document.getElementById("sig-graphic").value.trim();
+        cfg.useGraphic = useGraphicCheckbox.checked;
+        cfg.graphic = graphicInput.value.trim();
         cfg.width = parseInt(document.getElementById("sig-width").value);
         cfg.height = parseInt(document.getElementById("sig-height").value);
         cfg.positionx = parseInt(document.getElementById("sig-x").value);
         cfg.positiony = parseInt(document.getElementById("sig-y").value);
+
         document.getElementById("modal-signature").classList.add("hidden");
     };
 
@@ -219,32 +226,30 @@ function openSignatureModal(docId) {
     };
 }
 
-function openTsaModal(docId) {
+async function openTsaModal(docId) {
     const doc = globalDocuments.find((d) => d.id == docId);
-    const cfg = doc.signatureConfig || {};
-    cfg.tsp = cfg.tsp || {};
+    if (!doc) {
+        showToast("Documento no encontrado", "error");
+        return;
+    }
+    doc.signatureConfig = doc.signatureConfig || {};
+    doc.signatureConfig.tsp = doc.signatureConfig.tsp || {};
 
     const html = `
-    <label>URL del TSA:</label>
-    <input type="text" id="tsa-url" class="input" value="${
-        cfg.tsp.url || ""
-    }" placeholder="https://...">
+        <label>URL del TSA:</label>
+        <input type="text" id="tsa-url" class="input" value="${doc.signatureConfig.tsp.url || ""}" placeholder="https://...">
 
-    <label>Usuario:</label>
-    <input type="text" id="tsa-user" class="input" value="${
-        cfg.tsp.name || ""
-    }" placeholder="usuario">
+        <label>Usuario:</label>
+        <input type="text" id="tsa-user" class="input" value="${doc.signatureConfig.tsp.name || ""}" placeholder="usuario">
 
-    <label>Contraseña:</label>
-    <input type="password" id="tsa-pass" class="input" value="${
-        cfg.tsp.password || ""
-    }" placeholder="********">
-  `;
+        <label>Contraseña:</label>
+        <input type="password" id="tsa-pass" class="input" value="${doc.signatureConfig.tsp.password || ""}" placeholder="********">
+    `;
 
     document.getElementById("tsa-fields").innerHTML = html;
     document.getElementById("modal-tsa").classList.remove("hidden");
 
-    document.getElementById("save-tsa").onclick = () => {
+    document.getElementById("save-tsa").onclick = async () => {
         const url = document.getElementById("tsa-url");
         const user = document.getElementById("tsa-user");
         const pass = document.getElementById("tsa-pass");
@@ -254,18 +259,46 @@ function openTsaModal(docId) {
         if (url.value.trim() && (!user.value.trim() || !pass.value.trim())) {
             if (!user.value.trim()) user.classList.add("input-error");
             if (!pass.value.trim()) pass.classList.add("input-error");
-            alert(
-                "Si se proporciona una URL TSA, debe ingresar usuario y contraseña."
-            );
+            showToast("Se requieren usuario y contraseña para TSA", "warning");
             return;
         }
 
-        cfg.tsp = {
-            url: url.value.trim(),
-            name: user.value.trim(),
-            password: pass.value.trim(),
-        };
-        document.getElementById("modal-tsa").classList.add("hidden");
+        try {
+            doc.signatureConfig.tsp.url = url.value.trim();
+            doc.signatureConfig.tsp.name = user.value.trim();
+            doc.signatureConfig.tsp.password = pass.value.trim();
+
+            const urlIsValid = !!url.value.trim();
+            doc.signatureConfig.useTsp = urlIsValid;
+
+            if (doc.signatureConfig.useTsp) {
+                const csvContent = `${doc.signatureConfig.tsp.url},${doc.signatureConfig.tsp.name},${doc.signatureConfig.tsp.password}`;
+                const formData = new FormData();
+                formData.append("csv_file", new Blob([csvContent], { type: "text/csv" }), "tsa_credentials.csv");
+
+                const response = await fetch(`${BASE_URL}?op=csv_upload_tsa`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || "Error al subir credenciales TSA");
+                }
+                doc.signatureConfig.tspUrl = result.url;
+            }
+
+            doc.status = doc.signatureConfig.useTsp ? "configured" : "pending";
+
+            showToast("Configuración TSA guardada", "success");
+            document.getElementById("modal-tsa").classList.add("hidden");
+            await generateTableRows(); 
+
+        } catch (error) {
+            console.error("Error en configuración TSA:", error);
+            showToast(`Error: ${error.message}`, "error");
+        }
     };
 
     document.getElementById("close-tsa").onclick = () => {
@@ -273,11 +306,11 @@ function openTsaModal(docId) {
     };
 }
 
+
 function BtnFirmarDocument(doc) {
     try {
         const userId = UserManager.getUserId();
         const userName = UserManager.getUserName();
-
         if (!doc?.codePdf) {
             throw new Error("Documento no tiene código PDF válido");
         }
@@ -323,26 +356,25 @@ function BtnFirmarDocument(doc) {
         }
 
         if (cfg.useTsp) {
-            if (!cfg.tsp?.url) {
-                throw new Error("URL TSP no configurada");
+            if (!cfg.tspUrl || !isValidUrl(cfg.tspUrl)) {
+                throw new Error("URL del archivo CSV de TSP no válida o no configurada");
             }
-            params.set("tsp", `${BASE_URL}?op=csv&csv=tsp&user_id=${userId}`);
-            if (cfg.tsp.name) params.set("tsp_user", cfg.tsp.name);
-            if (cfg.tsp.password) params.set("tsp_pass", cfg.tsp.password);
+            params.set("tsp", cfg.tspUrl); // Aquí se pasa directamente la URL del CSV ya subida
             params.set("tlv", 1);
         } else {
             params.set("tlv", 0);
         }
 
         const uri = "girasoldesktop://?" + params.toString();
-        console.log("Iniciando proceso de firma:", {
-            document: doc.id,
-            user: userId,
-            params: Object.fromEntries(params),
-        });
+        const timeout = setTimeout(() => {
+            alert("Parece que no tienes instalado el programa de escritorio. Por favor, instálalo para continuar.");
+        }, 1500);
 
-        console.log("Redirigiendo a:", uri);
         window.location.href = uri;
+
+        window.addEventListener("blur", () => {
+            clearTimeout(timeout);
+        });   
         startSignaturePolling(doc.codePdf, userId);
     } catch (error) {
         console.error("Error en BtnFirmarDocument:", error);

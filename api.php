@@ -261,6 +261,62 @@ if ($method === 'GET' && $op === 'csv_download' && isset($_GET['codigo'])) {
     exit;
 }
 
+if ($method === 'POST' && $op === 'csv_upload_tsa') {
+    if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "error" => "Archivo CSV no recibido"]);
+        exit;
+    }
+
+    $file = $_FILES['csv_file'];
+    $fileName = 'tsa_' . uniqid() . '.csv';
+    $filePath = $csvDir . '/' . $fileName;
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($file['tmp_name']);
+
+    if ($mime !== 'text/plain' && $mime !== 'text/csv') {
+        http_response_code(415);
+        echo json_encode(["success" => false, "error" => "Formato no válido, solo CSV permitido"]);
+        exit;
+    }
+
+    if (move_uploaded_file($file['tmp_name'], $filePath)) {
+        $url = 'http://localhost:8080/girasol/samplescsv/' . $fileName;
+
+        echo json_encode([
+            "success" => true,
+            "url" => $url,
+            "path" => $filePath,
+            "file" => $fileName,
+            "id" => "tsa"
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["success" => false, "error" => "Error al mover archivo"]);
+    }
+
+    exit;
+}
+
+
+if ($method === 'GET' && $op === 'csv_download' && isset($_GET['file'])) {
+    $fileName = basename($_GET['file']); // Limpia el nombre
+    $filePath = $csvDir . '/' . $fileName; // Corregido para leer desde samplescsv
+
+    if (file_exists($filePath)) {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit;
+    } else {
+        http_response_code(404);
+        echo json_encode(["error" => "Archivo CSV no encontrado"]);
+        exit;
+    }
+}
+
 
 // ====================================
 // Método o ruta no válida

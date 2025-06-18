@@ -24,6 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
           uri += `&tsp=${encodeURIComponent(primerTsp)}`;
         }
         window.location.href = uri;
+        const userId = UserManager.getUserId();
+        globalDocuments.forEach((doc) => {
+          if (doc.status !== "signed") {
+            startSignaturePollingMulti(doc.codePdf, userId);
+          }
+        });
       } catch (err) {
         console.error("Error al subir CSV:", err);
         alert("Ocurrió un error al guardar el CSV en el servidor.");
@@ -42,11 +48,12 @@ function prepararFirmasDesdeJSON() {
 
     const code = encodeURIComponent(doc.codePdf);
     const tspUrl = cfg.useTsp ? cfg.tsp?.url || "" : "";
-
+    const userId = UserManager.getUserId();
+    
     firmas.push({
       fileName: doc.fileName,
       urlDescarga: `${BASE_URL}?op=sign_download&codigo=${code}`,
-      urlSubida: `${BASE_URL}?op=sign_upload&codigo=${code}`,
+      urlSubida: `${BASE_URL}?op=sign_upload&codigo=${code}&user_id=${userId}`,
       x: cfg.positionx,
       y: cfg.positiony,
       width: cfg.width,
@@ -111,4 +118,61 @@ async function guardarCSVEnServidor(csvContent) {
     urlDescarga: downloadUrl,
     rutaLocal: `/samplescsv/${codigo}.csv`,
   };
+}
+
+function startSignaturePollingMulti(docId, userId) {
+  const interval = setInterval(async () => {
+    try {
+      globalSignedDocs = await loadSignedDocuments();
+      const userSignedDocs = globalSignedDocs[userId] || [];
+      const isSigned = userSignedDocs.some(
+        (entry) => entry.code.trim() === String(docId).trim()
+      );
+
+      if (isSigned) {
+        clearInterval(interval);
+
+        // Actualizar estado local del documento
+        const doc = globalDocuments.find(
+          (d) => String(d.codePdf).trim() === String(docId).trim()
+        );
+        if (doc) doc.status = "signed";
+
+        await generateTableRows(); // refresca la tabla
+        showToast("Documento firmado exitosamente", "success");
+      }
+    } catch (error) {
+      clearInterval(interval);
+    }
+  }, 3000);
+}
+
+async function viewSignedDocument(docId) {
+  try {
+    const doc = globalDocuments.find((d) => d.id == docId);
+    if (!doc) throw new Error("Documento no encontrado");
+    const userId = UserManager.getUserId();
+    const signedDocUrl = `/girasol/sign_download.php?codigo=${encodeURIComponent(
+      doc.codePdf
+    )}&user_id=${userId}`;
+    window.open(signedDocUrl, "_blank");
+  } catch (error) {
+    console.error("Error al ver documento:", error);
+    showToast("Error al mostrar documento firmado", "error");
+  }
+}
+
+async function loadSignedDocuments() {
+  try {
+    const response = await fetch("/girasol/api_signed_docs.php");
+
+    if (!response.ok) throw new Error("No se pudo cargar signed_docs.json");
+    return await response.json();
+  } catch (error) {
+    console.error("Error al cargar signed_docs.json:", error);
+    return {};
+  }
+}
+function showToast(message, type = "info") {
+  console.log(`${type.toUpperCase()}: ${message}`);
 }

@@ -52,7 +52,7 @@ function prepararFirmasDesdeJSON() {
     
     firmas.push({
       fileName: doc.fileName,
-      urlDescarga: `${BASE_URL}?op=sign_download&codigo=${code}`,
+      urlDescarga: getPdfUrlFromCode(code),
       urlSubida: `${BASE_URL}?op=sign_upload&codigo=${code}&user_id=${userId}`,
       x: cfg.positionx,
       y: cfg.positiony,
@@ -70,6 +70,11 @@ function prepararFirmasDesdeJSON() {
 }
 
 function generarCSV(firmas) {
+  const escapeCsv = (text) =>
+    `"${(text || "")
+      .replace(/\n/g, "\\n")       // Escapar saltos de línea reales
+      .replace(/"/g, '""')}"`;     // Escapar comillas dobles
+
   return firmas
     .map((sig) => {
       return [
@@ -80,7 +85,7 @@ function generarCSV(firmas) {
         sig.y,
         sig.width,
         sig.height,
-        `"${sig.sigText.replace(/"/g, '""')}"`,
+        escapeCsv(sig.sigText),
         sig.graphic || "",
         sig.page,
         sig.textSize,
@@ -88,6 +93,7 @@ function generarCSV(firmas) {
     })
     .join("\n");
 }
+
 
 async function guardarCSVEnServidor(csvContent) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -152,7 +158,7 @@ async function viewSignedDocument(docId) {
     const doc = globalDocuments.find((d) => d.id == docId);
     if (!doc) throw new Error("Documento no encontrado");
     const userId = UserManager.getUserId();
-    const signedDocUrl = `/girasol/sign_download.php?codigo=${encodeURIComponent(
+    const signedDocUrl = `/sign_download.php?codigo=${encodeURIComponent(
       doc.codePdf
     )}&user_id=${userId}`;
     window.open(signedDocUrl, "_blank");
@@ -164,7 +170,7 @@ async function viewSignedDocument(docId) {
 
 async function loadSignedDocuments() {
   try {
-    const response = await fetch("/girasol/api_signed_docs.php");
+    const response = await fetch("/api_signed_docs.php");
 
     if (!response.ok) throw new Error("No se pudo cargar signed_docs.json");
     return await response.json();

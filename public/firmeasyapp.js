@@ -1,6 +1,22 @@
 let globalDocuments = [];
 let globalSignedDocs = {};
 
+function getPdfUrlFromCode(codePdf) {
+    const map = {
+        "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2": "pdfWeb.pdf",
+        "bb59a806-f5f1-44b5-a629-87d5e2f0af76": "sample.pdf",
+        // Agrega más códigos y archivos según tus necesidades
+    };
+
+    const fileName = map[codePdf];
+    if (!fileName) {
+        throw new Error("No hay PDF asignado para este código.");
+    }
+
+    return `https://raw.githubusercontent.com/Yossec/pdf-descarga/main/${fileName}`;
+}
+
+
 window.onload = () => {
     localStorage.clear();
 };
@@ -331,7 +347,7 @@ function BtnFirmarDocument(doc) {
             },
         });
 
-        params.set("from", `${BASE_URL}?op=sign_download&codigo=${codigo}`);
+        params.set("from", getPdfUrlFromCode(doc.codePdf));
         params.set(
             "to",
             `${BASE_URL}?op=sign_upload&codigo=${codigo}&user_id=${userId}`
@@ -406,7 +422,7 @@ function BtnFirmarDocumentById(docId) {
 
 async function loadSignedDocuments() {
     try {
-        const response = await fetch("/girasol/api_signed_docs.php");
+        const response = await fetch("/api_signed_docs.php");
 
         if (!response.ok) throw new Error("No se pudo cargar signed_docs.json");
         return await response.json();
@@ -424,7 +440,7 @@ async function viewSignedDocument(docId) {
         const doc = globalDocuments.find((d) => d.id == docId);
         if (!doc) throw new Error("Documento no encontrado");
         const userId = UserManager.getUserId();
-        const signedDocUrl = `/girasol/sign_download.php?codigo=${encodeURIComponent(doc.codePdf)}&user_id=${userId}`;
+        const signedDocUrl = `/sign_download.php?codigo=${encodeURIComponent(doc.codePdf)}&user_id=${userId}`;
         window.open(signedDocUrl, "_blank");
     } catch (error) {
         console.error("Error al ver documento:", error);

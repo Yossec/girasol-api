@@ -1,6 +1,9 @@
 {
-    "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2": "C:\/laragon\/www\/girasol\/samples\/pdfWeb.pdf",
-    "bb59a806-f5f1-44b5-a629-87d5e2f0af76": "C:\/laragon\/www\/girasol\/samples\/sample.pdf",
-    "4d209355-18e8-4c1a-b8cd-9895da40d231": "C:\/laragon\/www\/girasol\/samples\/sample3.pdf",
-    "csv_firmas-2025-06-18T06-30-54-483Z": "C:\\laragon\\www\\girasol\/samplescsv\/68525d1e796ad_firmas.csv"
+    "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2": "\/samples\/pdfWeb.pdf",
+    "bb59a806-f5f1-44b5-a629-87d5e2f0af76": "\/samples\/sample.pdf",
+    "4d209355-18e8-4c1a-b8cd-9895da40d231": "\/samples\/sample3.pdf",
+    "csv_firmas-2025-06-19T17-12-33-384Z": "\/var\/www\/html\/samplescsv\/685445016b7c5_firmas.csv",
+    "csv_firmas-2025-06-19T17-39-18-779Z": "\/var\/www\/html\/samplescsv\/68544b46ca7c9_firmas.csv",
+    "csv_firmas-2025-06-19T17-39-33-284Z": "\/var\/www\/html\/samplescsv\/68544b5551f66_firmas.csv",
+    "csv_firmas-2025-06-19T17-43-24-975Z": "\/var\/www\/html\/samplescsv\/68544c3d0719b_firmas.csv"
 }

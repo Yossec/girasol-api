@@ -17,6 +17,7 @@ $samplesDir = $baseDir . '/samples';
 $csvDir = $baseDir . '/samplescsv';
 $dbFile = $baseDir . '/fake_db.json';
 
+
 if (!file_exists($uploadDir)) mkdir($uploadDir, 0755, true);
 if (!file_exists($samplesDir)) mkdir($samplesDir, 0755, true);
 if (!file_exists($csvDir)) mkdir($csvDir, 0755, true);
@@ -33,7 +34,7 @@ if ($method === 'GET' && $op === 'sign_download' && isset($_GET['codigo'])) {
     $codigo = $_GET['codigo'];
 
     if (isset($fakeDb[$codigo])) {
-        $archivo = $fakeDb[$codigo];
+        $archivo = __DIR__ . '/' . ltrim($fakeDb[$codigo], '/');
         if (file_exists($archivo)) {
             header('Content-Type: application/pdf');
             header('Content-Disposition: attachment; filename="' . basename($archivo) . '"');

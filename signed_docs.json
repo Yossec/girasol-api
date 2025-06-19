@@ -1,21 +1,2 @@
 {
-    "user_3e110ko": [
-        {
-            "code": "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2",
-            "filePath": "\/var\/www\/html\/uploads\/68544cf10ee33_cambio_signed_B_20250619_124620.pdf",
-            "signedAt": "2025-06-19T17:46:25+00:00"
-        }
-    ],
-    "user_tsmt20l": [
-        {
-            "code": "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2",
-            "filePath": "\/var\/www\/html\/uploads\/68544d866e685_cambio_signed_B_20250619_124849.pdf",
-            "signedAt": "2025-06-19T17:48:54+00:00"
-        },
-        {
-            "code": "bb59a806-f5f1-44b5-a629-87d5e2f0af76",
-            "filePath": "\/var\/www\/html\/uploads\/68544da36d9fc_cambio_signed_B_20250619_124918.pdf",
-            "signedAt": "2025-06-19T17:49:23+00:00"
-        }
-    ]
 }

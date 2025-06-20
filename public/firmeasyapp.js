@@ -346,13 +346,12 @@ function BtnFirmarDocument(doc) {
                 size: { width: cfg.width, height: cfg.height },
             },
         });
-
+        console.log(`${BASE_URL}`);
         params.set("from", getPdfUrlFromCode(doc.codePdf));
         params.set(
             "to",
             `${BASE_URL}?op=sign_upload&codigo=${codigo}&user_id=${userId}`
         );
-
         params.set("vis_sig_x", cfg.positionx || 100);
         params.set("vis_sig_y", cfg.positiony || 150);
         params.set("vis_sig_width", cfg.width || 150);

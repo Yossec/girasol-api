@@ -5,6 +5,12 @@ function getPdfUrlFromCode(codePdf) {
     const map = {
         "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2": "pdfWeb.pdf",
         "bb59a806-f5f1-44b5-a629-87d5e2f0af76": "sample.pdf",
+        "5df66ad4-aea0-4563-86d0-c1b9ef054759": "multi_hoja_pdf.pdf",
+        "5a5e91a4-c5ce-4cad-8ad9-fdafff8d1148":"pdf_6paginas.pdf",
+        "031a0d34-9748-421c-a033-4dc71eb68b57": "doc_firmador.pdf",
+        "14767618-de96-4f5e-ab1d-bb5116a5b251": "pdf_escaneado.pdf",
+        "9dba24f5-cc00-47fa-9046-97872f38c8f4": "firmeasy.pdf",
+        "74e88259-6db1-48fa-87be-5a21e31e8d58": "firmeasy_v1.pdf"
         // Agrega más códigos y archivos según tus necesidades
     };
 

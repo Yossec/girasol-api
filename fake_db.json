@@ -1,5 +1,11 @@
 {
-    "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2": "/samples/pdfWeb.pdf",
-    "bb59a806-f5f1-44b5-a629-87d5e2f0af76": "/samples/sample.pdf",
-    "4d209355-18e8-4c1a-b8cd-9895da40d231": "/samples/sample3.pdf"
+    "a1f45880-81f4-4e2c-9fed-3c0a098d8cf2": "\/samples\/pdfWeb.pdf",
+    "bb59a806-f5f1-44b5-a629-87d5e2f0af76": "\/samples\/sample.pdf",
+    "4d209355-18e8-4c1a-b8cd-9895da40d231": "\/samples\/sample3.pdf",
+    "5a5e91a4-c5ce-4cad-8ad9-fdafff8d1148": "\/samples\/pdf_6paginas.pdf",
+    "031a0d34-9748-421c-a033-4dc71eb68b57": "\/samples\/doc_firmado.pdf",
+    "14767618-de96-4f5e-ab1d-bb5116a5b251": "\/samples\/pdf_escaneado.pdf",
+    "9dba24f5-cc00-47fa-9046-97872f38c8f4": "\/samples\/firmeasy.pdf",
+    "74e88259-6db1-48fa-87be-5a21e31e8d58": "\/samples\/firmeasy_v1.pdf",
+    "csv_firmas-2025-07-24T14-29-21-788Z": "\/var\/www\/html\/samplescsv\/68824341c6064_firmas.csv"
 }

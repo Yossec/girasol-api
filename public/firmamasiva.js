@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const primerTsp = globalDocuments.find((d) => d.signatureConfig?.useTsp)
           ?.signatureConfig?.tsp?.url;
 
-        let uri = `girasoldesktop://?batch_csv=${encodeURIComponent(
+        let uri = `firmeasyapp://?batch_csv=${encodeURIComponent(
           urlDescarga
         )}`;
         if (primerTsp && primerTsp.trim() !== "") {

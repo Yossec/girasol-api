@@ -10,7 +10,15 @@ function getPdfUrlFromCode(codePdf) {
         "031a0d34-9748-421c-a033-4dc71eb68b57": "doc_firmador.pdf",
         "14767618-de96-4f5e-ab1d-bb5116a5b251": "pdf_escaneado.pdf",
         "9dba24f5-cc00-47fa-9046-97872f38c8f4": "firmeasy.pdf",
-        "74e88259-6db1-48fa-87be-5a21e31e8d58": "firmeasy_v1.pdf"
+        "74e88259-6db1-48fa-87be-5a21e31e8d58": "firmeasy_v1.pdf",
+        "346db3fb-9c32-4af7-a44e-9aa741699d19": "pdf_contrasenia.pdf",
+        "8ebe7192-4239-41fc-9dae-5ef40b747167": "pdf_libro.pdf",
+        "c41034f1-d875-4f2e-ad8a-38eceed3925b": "power_point.pdf",
+        "ff496616-54cc-42ef-a353-acc31fb1884e": "pdf_daniado.pdf",
+        "9ef9de8e-7d35-4c0b-b810-ed9165a7eef3": "pdf_sin_cabecera.pdf",
+        "e64b02fb-92d2-4919-8b85-2134627b2607": "prueba_firmado.pdf",
+        "950c1b45-ce88-4857-b184-a5e933f7ff35": "pdf_horizontal.pdf",
+        "03ec0a0d-28ba-405d-9c2f-92ca70074bde": "pdf_contrasenia.pdf"
         // Agrega más códigos y archivos según tus necesidades
     };
 
@@ -386,7 +394,7 @@ function BtnFirmarDocument(doc) {
             params.set("tlv", 0);
         }
 
-        const uri = "girasoldesktop://?" + params.toString();
+        const uri = "firmeasyapp://?" + params.toString();
         const timeout = setTimeout(() => {
             alert("Parece que no tienes instalado el programa de escritorio. Por favor, instálalo para continuar.");
         }, 1500);
